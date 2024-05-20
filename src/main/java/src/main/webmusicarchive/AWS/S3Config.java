@@ -2,17 +2,16 @@ package src.main.webmusicarchive.AWS;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class S3Service {
+@Configuration
+public class S3Config {
     @Value("${access.key.id}")
     private String accessKeyId;
 
@@ -32,7 +31,8 @@ public class S3Service {
                 accessKeyId,
                 accessKeySecret,
                 sessionToken
-        );// Get Amazon S3 client and return the S3 client object
+        );
+        // Get Amazon S3 client and return the S3 client object
         return AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
