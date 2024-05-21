@@ -2,6 +2,7 @@ package src.main.webmusicarchive.File;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -14,10 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
+import src.main.webmusicarchive.Application.ApplicationException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,11 +76,22 @@ public class FileService {
 
         } catch (AmazonServiceException e) {
             LOG.error("Error {} occurred while uploading file", e.getMessage());
-            return null;
+            throw new ApplicationException("file/0001","An error occurred during file upload", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException e) {
             LOG.error("Error {} occurred while deleting file", e.getMessage());
         }
         return fileName;
+    }
+
+
+    @Async
+    public void remove(String fileName){
+        LOG.debug("File name {}",fileName);
+        try{
+            amazonS3.deleteObject(s3BucketName,fileName);
+        }catch (AmazonServiceException e){
+            LOG.error("Error {} occurred while deleting file", e.getMessage());
+        }
     }
 
 }

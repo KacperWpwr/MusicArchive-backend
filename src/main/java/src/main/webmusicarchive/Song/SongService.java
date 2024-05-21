@@ -2,6 +2,8 @@ package src.main.webmusicarchive.Song;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class SongService implements ISongService{
     private final SongRepository songRepository;
     private final FileService fileService;
     private final SongMapper songMapper;
+    private static final Logger LOG = LoggerFactory.getLogger(FileService.class);
 
 
     @Transactional
@@ -56,6 +59,18 @@ public class SongService implements ISongService{
         return songMapper.songListDTO(
                 songRepository.findAll()
         );
+    }
+
+    @Override
+    public void removeSong(long id) {
+        Song song = songRepository.findById(id)
+                .orElseThrow(()->new ApplicationException("song/0003","Song not found",HttpStatus.NOT_FOUND));
+
+        LOG.info(song.getSongFileName());
+        fileService.remove(song.getImageFileName());
+        fileService.remove(song.getSongFileName());
+
+        songRepository.delete(song);
     }
 
 

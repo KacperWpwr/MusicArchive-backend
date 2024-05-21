@@ -28,4 +28,9 @@ public class SongRESTController {
                 HttpStatus.OK
         );
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteSong(@PathVariable long id){
+        songService.removeSong(id);
+    }
 }

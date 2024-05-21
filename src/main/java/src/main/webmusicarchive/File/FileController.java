@@ -35,17 +35,13 @@ public class FileController {
 
     }
 
-    @PostMapping
-    public ResponseEntity<Object> save(@RequestParam("file") MultipartFile multipartFile) {
-        fileService.save(multipartFile);
-        return new ResponseEntity<>(MESSAGE_1, HttpStatus.OK);
-    }
 
     @GetMapping(value = "/song", produces = "audio/mp3")
     public ResponseEntity<Object> getSong(@RequestParam String fileName){
         return ResponseEntity
                 .ok()
-                .body(new InputStreamResource(fileService.findByName(fileName)));
+                .body(Mono.fromSupplier(()->
+                        new InputStreamResource(fileService.findByName(fileName))));
     }
 
 }

@@ -5,6 +5,8 @@ import src.main.webmusicarchive.Song.dto.SongListDTO;
 import src.main.webmusicarchive.Song.request.CreateSongRequest;
 
 public interface ISongService {
-    public SongDTO addSong(CreateSongRequest request);
+    SongDTO addSong(CreateSongRequest request);
     SongListDTO getAllSongs();
+
+    void removeSong(long id);
 }
