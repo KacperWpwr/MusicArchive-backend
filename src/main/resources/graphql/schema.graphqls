@@ -1,0 +1,11 @@
+type Query{
+    songs: [Song]!,
+#    song(id:ID):Song!
+}
+
+type Song{
+    id: ID!,
+    title: String!,
+    imageFileURI: String!,
+    audioFileURI: String!
+}
