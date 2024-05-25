@@ -13,6 +13,8 @@ import src.main.webmusicarchive.Song.dto.SongDTO;
 import src.main.webmusicarchive.Song.dto.SongListDTO;
 import src.main.webmusicarchive.Song.request.CreateSongRequest;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SongService implements ISongService{
@@ -34,24 +36,19 @@ public class SongService implements ISongService{
         if (request.songImage() == null){
             throw new ApplicationException("song/0002","Image not present", HttpStatus.CONFLICT);
         }
-
-        String imageFileName = fileService.save(request.songImage());
-        String audioFileName = fileService.save(request.songAudio());
-
         Song song = Song.builder()
                 .title(request.title())
                 .artist(request.artist())
-                .songFileName(audioFileName)
-                .imageFileName(imageFileName)
                 .build();
 
         song = songRepository.save(song);
+        String imageFileName = fileService.save(request.songImage(), "song-"+song.getId()+"-image");
+        String audioFileName = fileService.save(request.songAudio(),"song-"+song.getId()+"-audio");
 
-        return new SongDTO(song.getId(),
-                song.getTitle(),
-                song.getArtist(),
-                song.getImageFileName(),
-                song.getSongFileName());
+        song.setSongFileName(audioFileName);
+        song.setImageFileName(imageFileName);
+        song = songRepository.save(song);
+        return songMapper.songDTO(song);
     }
 
     @Override
@@ -71,6 +68,21 @@ public class SongService implements ISongService{
         fileService.remove(song.getSongFileName());
 
         songRepository.delete(song);
+    }
+
+    @Override
+    public List<Song> findAllSongs() {
+        return songRepository.findAll();
+    }
+
+    @Override
+    public String getSongImageFileURI(Song song) {
+        return fileService.convertFileNameToBucketURI(song.getImageFileName());
+    }
+
+    @Override
+    public String getSongAudioFileURI(Song song) {
+        return fileService.convertFileNameToBucketURI(song.getSongFileName());
     }
 
 
